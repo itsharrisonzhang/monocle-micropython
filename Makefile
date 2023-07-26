@@ -69,7 +69,7 @@ DEFS += -DBUILD_VERSION='"$(BUILD_VERSION)"'
 DEFS += -DLFS2_NO_ASSERT
 
 # Set linker options
-LDFLAGS += -Lnrfx/mdk -T monocle-core/monocle.ld
+LDFLAGS += -Lnrfx/mdk -T monocle-nrf52dk/monocle.ld
 LDFLAGS += -Wl,--gc-sections
 LDFLAGS += -Xlinker -Map=$(@:.elf=.map)
 LDFLAGS += --specs=nano.specs
@@ -81,7 +81,7 @@ INC += -Imicropython/lib/cmsis/inc
 INC += -Imicropython/shared/readline
 INC += -Imodules
 INC += -Imodules/libvgrs/src
-INC += -Imonocle-core
+INC += -Imonocle-nrf52dk
 INC += -Inrfx
 INC += -Inrfx/drivers
 INC += -Inrfx/drivers/include
@@ -98,9 +98,9 @@ INC += -Isoftdevice/include/nrf52
 CFLAGS += $(WARN) $(OPT) $(INC) $(DEFS)
 
 SRC_C += main.c
-SRC_C += monocle-core/monocle-critical.c
-SRC_C += monocle-core/monocle-drivers.c
-SRC_C += monocle-core/monocle-startup.c
+SRC_C += monocle-nrf52dk/monocle-critical.c
+SRC_C += monocle-nrf52dk/monocle-drivers.c
+SRC_C += monocle-nrf52dk/monocle-startup.c
 SRC_C += mphalport.c
 
 SRC_C += micropython/extmod/modasyncio.c
