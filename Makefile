@@ -33,6 +33,7 @@ FROZEN_MANIFEST = modules/frozen-manifest.py
 
 # Include py core make definitions
 include micropython/py/py.mk
+include micropython/extmod/extmod.mk
 
 # Define the toolchain prefix for ARM GCC
 CROSS_COMPILE = arm-none-eabi-
@@ -96,6 +97,7 @@ INC += -Isoftdevice/include/nrf52
 
 # Assemble the C flags variable
 CFLAGS += $(WARN) $(OPT) $(INC) $(DEFS)
+CXXFLAGS += $(filter-out -std=gnu17,$(CFLAGS))
 
 SRC_C += main.c
 SRC_C += monocle-nrf52dk/monocle-critical.c
@@ -103,21 +105,6 @@ SRC_C += monocle-nrf52dk/monocle-drivers.c
 SRC_C += monocle-nrf52dk/monocle-startup.c
 SRC_C += mphalport.c
 
-SRC_C += micropython/extmod/modasyncio.c
-SRC_C += micropython/extmod/modbinascii.c
-SRC_C += micropython/extmod/modhashlib.c
-SRC_C += micropython/extmod/modjson.c
-SRC_C += micropython/extmod/modos.c
-SRC_C += micropython/extmod/modrandom.c
-SRC_C += micropython/extmod/modre.c
-SRC_C += micropython/extmod/modselect.c
-SRC_C += micropython/extmod/modtime.c
-SRC_C += micropython/extmod/vfs_blockdev.c
-SRC_C += micropython/extmod/vfs_lfs.c
-SRC_C += micropython/extmod/vfs_lfsx_file.c
-SRC_C += micropython/extmod/vfs_lfsx.c
-SRC_C += micropython/extmod/vfs_reader.c
-SRC_C += micropython/extmod/vfs.c
 SRC_C += modules/bluetooth.c
 SRC_C += modules/camera.c
 SRC_C += modules/device.c
@@ -190,13 +177,18 @@ SRC_C += nrfx/drivers/src/prs/nrfx_prs.c
 SRC_C += nrfx/helpers/nrfx_flag32_allocator.c
 SRC_C += nrfx/mdk/system_nrf52.c
 
-SRC_QSTR += $(SRC_C)
+SRC_C += modules/experimental.c
+
+SRC_CXX += modules/helpers/experimental_helper.cc
+
+SRC_QSTR += $(SRC_C) $(SRC_CXX)
 
 OBJ += $(PY_O)
 OBJ += $(addprefix build/, $(SRC_C:.c=.o))
+OBJ += $(addprefix build/, $(SRC_CXX:.cc=.o))
 
 # Link required libraries
-LIB += -lm -lc -lnosys -lgcc
+LIB += -lm -lc -lnosys -lgcc -lstdc++
 
 all: build/application.hex
 
