@@ -95,6 +95,13 @@ INC += -Isegger
 INC += -Isoftdevice/include
 INC += -Isoftdevice/include/nrf52
 
+INCLUDES += \
+-I$(DOWNLOADS_DIR) \
+-I$(DOWNLOADS_DIR)/gemmlowp \
+-I$(DOWNLOADS_DIR)/flatbuffers/include \
+-I$(DOWNLOADS_DIR)/kissfft \
+-I$(DOWNLOADS_DIR)/ruy
+
 # Assemble the C flags variable
 CFLAGS += $(WARN) $(OPT) $(INC) $(DEFS)
 CXXFLAGS += $(filter-out -std=gnu17,$(CFLAGS))
@@ -210,4 +217,5 @@ release: clean build/application.hex
 	mergehex -m build/settings.hex build/application.hex softdevice/s132_nrf52_7.3.0_softdevice.hex bootloader/build/nrf52832_xxaa_s132.hex -o build/monocle-micropython-$(BUILD_VERSION).hex
 	nrfutil pkg generate --hw-version 52 --application-version 0 --application build/application.hex --sd-req 0x0124 --key-file bootloader/published_privkey.pem build/monocle-micropython-$(BUILD_VERSION).zip
 
+-include $(OBJ:.o=.d)
 include micropython/py/mkrules.mk

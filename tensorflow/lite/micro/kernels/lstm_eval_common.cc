@@ -189,10 +189,9 @@ CellStateInfo CreateLstmCellStateInfo(const float cell_state_scale,
   // Cell state specifics
   cell_state_info.cell_clip = cell_clip;
   cell_state_info.quantized_cell_clip = static_cast<int16_t>(
-      std::min(std::max(static_cast<double>(cell_clip) /
-                            static_cast<double>(cell_state_scale),
-                        -32768.0),
-               32767.0));
+      std::min(std::max(static_cast<double>(cell_clip) / static_cast<double>(cell_state_scale),
+                        static_cast<double>(-32768.0)),
+               static_cast<double>(32767.0)));
 
   return cell_state_info;
 }

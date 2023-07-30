@@ -1,18 +1,3 @@
-# Copyright 2023 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
 ifneq (3.82,$(firstword $(sort $(MAKE_VERSION) 3.82)))
   $(error "Requires make version 3.82 or later (current is $(MAKE_VERSION))")
 endif
@@ -199,44 +184,17 @@ TARGET_TOOLCHAIN_ROOT :=
 # https://github.com/tensorflow/tensorflow/pull/42314#issuecomment-694360567
 BUILD_TYPE := default
 ifeq ($(BUILD_TYPE), debug)
-	# Specifying BUILD_TYPE=debug adds debug symbols to the binary (and makes it
-	# larger) and should be used to run a binary with gdb.
 	CXXFLAGS += -g
 	CCFLAGS  += -g
 else ifeq ($(BUILD_TYPE), release)
-	# The 'release' build results in the smallest binary (by virtue of removing
-	# strings from log messages, DCHECKs ...).
-	#
-	# The down-side is that we currently do not have a good mechanism to allow
-	# for logging that is not related to errors (e.g. profiling information, or
-	# logs that help determine if tests pass or fail). As a result, we are unable
-	# to run tests or benchmarks with BUILD_TYPE=release (which is a bit
-	# counter-intuitive). TODO(b/158205789): A global error reporter might help.
-	#
-	# For a close approximation of the release build use
-	# BUILD_TYPE=release_with_logs.
 	CXXFLAGS += -DNDEBUG -DTF_LITE_STRIP_ERROR_STRINGS
 	CCFLAGS  += -DNDEBUG -DTF_LITE_STRIP_ERROR_STRINGS
 else ifeq ($(BUILD_TYPE), release_with_logs)
-	# The latency with BUILD_TYPE=release_with_logs will be close to the 'release'
-	# build and there will still be error logs. This build type may be preferable
-	# for profiling and benchmarking.
 	CXXFLAGS += -DNDEBUG
 	CCFLAGS  += -DNDEBUG
 else ifeq ($(BUILD_TYPE), no_tf_lite_static_memory)
-	# TODO(b/287320282): remove the no_tf_lite_static_memory build.
-	#
-	# This build should not be used to run any binaries/tests since
-	# TF_LITE_STATIC_MEMORY should be defined for all micro builds. However,
-	# having a build without TF_LITE_STATIC_MEMORY is useful to catch errors in
-	# code that is shared between TfLite Mobile and TfLite Micro. See this issue
-	# for more details:
-	# https://github.com/tensorflow/tensorflow/issues/43076
 	CXXFLAGS := $(filter-out -DTF_LITE_STATIC_MEMORY, $(CXXFLAGS))
 	CCFLAGS := $(filter-out -DTF_LITE_STATIC_MEMORY, $(CCFLAGS))
-
-	# We are using C++17 for the no_tf_lite_static_memory_build to make it close
-	# to the TfLite bazel build.
 	CXXFLAGS := $(filter-out -std=c++11, $(CXXFLAGS))
 	CXXFLAGS += -std=c++17
 	CCFLAGS := $(filter-out -std=c11, $(CCLAGS))

@@ -4,3 +4,4 @@
 
 STATIC mp_obj_t factorial(mp_obj_t x_obj);
 STATIC mp_obj_t square(mp_obj_t x_obj);
+STATIC mp_obj_t do_nothing(mp_obj_t x_obj);

@@ -124,7 +124,7 @@ _stack_bot = _stack_top - 8K;
 
 /* Heap goes from end of bss ram to the bottom of the stack */
 
-_heap_start = _ebss;
+_heap_start = _ebss + 8K;
 _heap_end = _stack_bot;
 
 /* Throw an error if the heap becomes too small */

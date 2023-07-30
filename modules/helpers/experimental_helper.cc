@@ -1,6 +1,20 @@
 extern "C" {
 
 #include "experimental_helper.h"
+#include <cstdlib>
+
+class hi {
+    public :
+        hi(int i) : x(i), y(i + 1) {
+            void* m = malloc(4096);
+            free(m);
+            x = abs(x);
+        }
+    
+    private :
+    int x;
+    int y;
+};
 
 int _factorial(int const x) {
     if (x > 10) {
@@ -16,6 +30,8 @@ int _square(int const x) {
     if (x > 1000) {
         return 0;
     }
+    hi(1);
     return x * x;
 }
+
 }
