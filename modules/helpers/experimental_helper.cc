@@ -6,8 +6,6 @@ extern "C" {
 class hi {
     public :
         hi(int i) : x(i), y(i + 1) {
-            void* m = malloc(4096);
-            free(m);
             x = abs(x);
         }
     
