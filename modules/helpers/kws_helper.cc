@@ -7,25 +7,16 @@
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/micro/testing/micro_test.h"
 #include "tensorflow/lite/schema/schema_generated.h"
+#include <chrono>
 
 extern "C" {
 
-volatile unsigned int timer = 0;
+std::chrono::time_point<std::chrono::steady_clock> timer;
 
 int _loop();
 
 mp_obj_t run() {
-    // auto const work_duration = std::chrono::seconds{10};
-    // auto const start = std::chrono::high_resolution_clock::now();
-    // auto stop = std::chrono::high_resolution_clock::now();
-    // auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-
-    // int run_status = kTfLiteOk;
-    // while (duration < work_duration && run_status == kTfLiteOk) {
-    //     run_status = loop();
-    //     stop = std::chrono::high_resolution_clock::now();
-    //     duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-    // }
+    timer = std::chrono::steady_clock::now() + std::chrono::seconds{10};
     auto const status = _loop();
     if (status == kTfLiteError) {
       printf("%s\n", "Model exited with status `kTfLiteOk'");
@@ -49,16 +40,8 @@ int _loop() {
   micro_op_resolver.AddReshape();
   micro_op_resolver.AddSoftmax();
 
-  #if (defined(XTENSA) && defined(VISION_P6))
-    constexpr int tensor_arena_size = 28 * 1024;
-  #elif defined(XTENSA)
-    constexpr int tensor_arena_size = 15 * 1024;
-  #elif defined(HEXAGON)
-    constexpr int tensor_arena_size = 25 * 1024;
-  #else
-    constexpr int tensor_arena_size = 10 * 1024;
-  #endif
-    alignas(16) uint8_t tensor_arena[tensor_arena_size];
+  constexpr int tensor_arena_size = 10 * 1024;
+  alignas(16) uint8_t tensor_arena[tensor_arena_size];
 
   // Build an interpreter to run the model with.
   tflite::MicroInterpreter interpreter(model, micro_op_resolver, tensor_arena, tensor_arena_size);
@@ -66,7 +49,8 @@ int _loop() {
   TfLiteTensor* input = interpreter.input(0);
   if (!input || input->dims->size != 2 || input->dims->data[0] != 1 || input->type != kTfLiteInt8) { return kTfLiteError; }
 
-  while (++timer < 10) {
+  auto now = std::chrono::steady_clock::now();
+  while (now < timer) {
     // Copy a spectrogram created from a .wav audio file of someone saying "Yes" into input buffer.
     // TODO: Interface microphone here
     const int8_t* yes_features_data = g_yes_micro_f2e59fea_nohash_1_data;
@@ -116,7 +100,9 @@ int _loop() {
     no_score = output->data.int8[kNoIndex] + 128;
     if (!(no_score > silence_score && no_score > unknown_score && no_score > yes_score)) { return kTfLiteError; }
     printf("Silence: %d, Unknown: %d, Yes: %d, No: %d\n", silence_score, unknown_score, yes_score, no_score);
-  } // while (...)
+
+    now = std::chrono::steady_clock::now();
+  }
   printf("%s\n", "Ran successfully\n");
   return kTfLiteOk;
 }
