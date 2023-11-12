@@ -630,6 +630,7 @@ SRC_C += nrfx/mdk/system_nrf52.c
 
 SRC_C += modules/experimental.c
 SRC_C += modules/kws.c
+SRC_C += modules/c_microphone.c
 
 SRC_CXX += modules/helpers/experimental_helper.cc
 SRC_CXX += modules/helpers/kws_helper.cc

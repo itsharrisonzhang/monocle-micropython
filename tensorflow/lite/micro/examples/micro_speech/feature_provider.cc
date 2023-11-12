@@ -41,7 +41,7 @@ TfLiteStatus FeatureProvider::PopulateFeatureData(int32_t last_time_in_ms,
     slices_needed = kFeatureSliceCount;
   }
   *how_many_new_slices = slices_needed;
-
+  
   const int slices_to_keep = kFeatureSliceCount - slices_needed;
   const int slices_to_drop = kFeatureSliceCount - slices_to_keep;
   
